@@ -6,35 +6,67 @@
 from tkinter import Tk, Label, RAISED
 import pyperclip
 
-################################################################################
-################################################################################
-def updateClipboard():
-    clippingText = pyperclip.paste() # get the text to be pasted
-    processClipping(clippingText=clippingText) # process the clipping
-    root.after(ms=100, func=updateClipboard) # check for new clippings after 100 ms
+class ClipboardManager():
+    ################################################################################
+    ################################################################################
+    def __init__(self, root):
+        self.root          = root
+        self.labelList     = []
+        self.labelTextList = []
+        
+    ################################################################################
+    ################################################################################
+    def appendLabelTextToLabelTextList(self, textValue):
+        label = Label(
+                    root, 
+                    text=textValue, 
+                    cursor="arrow", 
+                    relief="raised", 
+                    padx=20, 
+                    pady=10, 
+                    wraplength=500,
+                    font=("Helvetica", 14),
+                    background="#f5f5f5"
+                )
+        label.bind("<Button-1>", lambda event, labelElem=label: self.onClick(labelElem)) # bind label to click event
+        label.pack(padx=20, pady=20) # display label in pack format
+        
+        self.labelTextList.append(label['text'])
+        
+        return label
+        
+    ################################################################################
+    ################################################################################
+    def updateClipboard(self):
+        clippingText = pyperclip.paste() # get the text to be pasted
+        self.processClipping(clippingText=clippingText) # process the clipping
+        root.after(ms=100, func=self.updateClipboard) # check for new clippings after 100 ms
 
-################################################################################
-################################################################################
-def processClipping(clippingText):
-    cleanedClippingText = cleanClippingText(clippingText=clippingText) # clean clipping text
-    label["text"] = cleanedClippingText # set label text to cleaned clipping text
 
-################################################################################
-################################################################################
-def cleanClippingText(clippingText):
-    cleanedClippingText = ""
-    for character in clippingText: # only keep characters less than 65535 in Unicode (range for Tool Command Language (TCL))
-        if (ord(character) <= 65535):
-            cleanedClippingText = cleanedClippingText + character
-             
-    return cleanedClippingText
+    ################################################################################
+    ################################################################################
+    def processClipping(self, clippingText):
+        cleanedClippingText = self.cleanClippingText(clippingText=clippingText) # clean clipping text
+        
+        if cleanedClippingText not in self.labelTextList:
+            self.appendLabelTextToLabelTextList(cleanedClippingText)
 
-################################################################################
-################################################################################
-def onClick(labelElem):
-    labelText = labelElem["text"] # get text of clicked label
-    print(labelText) # print text to the screen
-    pyperclip.copy(labelText) # copy label text
+    ################################################################################
+    ################################################################################
+    def cleanClippingText(self, clippingText):
+        cleanedClippingText = ""
+        for character in clippingText: # only keep characters less than 65535 in Unicode (range for Tool Command Language (TCL))
+            if (ord(character) <= 65535):
+                cleanedClippingText = cleanedClippingText + character
+                
+        return cleanedClippingText
+        
+    ################################################################################
+    ################################################################################
+    def onClick(self, labelElem):
+        labelText = labelElem["text"] # get text of clicked label
+        print(labelText) # print text to the screen
+        pyperclip.copy(labelText) # copy label text
 
 ################################################################################
 ################################################################################
@@ -42,22 +74,10 @@ if __name__ == '__main__':
     root = Tk() # root element
     root['bg'] = '#a9a9a9'
     
-    label = Label(
-        root, 
-        text="", 
-        cursor="arrow", 
-        relief="raised", 
-        padx=20, 
-        pady=10, 
-        wraplength=500,
-        font=("Helvetica", 14),
-        background="#f5f5f5"
-        ) # create label
-    label.bind("<Button-1>", lambda event, labelElem=label: onClick(labelElem)) # bind label to click event
-    label.pack(padx=20, pady=20) # display label in pack format
+    clipboardManager = ClipboardManager(root)
     
-    updateClipboard() # updates clipboard infinitely until windows closes
+    clipboardManager.updateClipboard() # updates clipboard infinitely until windows closes
     
-    root.mainloop() # main application loop
+    clipboardManager.root.mainloop() # main application loop
     
     
