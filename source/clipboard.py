@@ -40,10 +40,21 @@ def onClick(labelElem):
 ################################################################################
 if __name__ == '__main__':
     root = Tk() # root element
+    root['bg'] = '#a9a9a9'
     
-    label = Label(root, text="", cursor="arrow", relief=RAISED, pady=5,  wraplength=500) # create label
+    label = Label(
+        root, 
+        text="", 
+        cursor="arrow", 
+        relief="raised", 
+        padx=20, 
+        pady=10, 
+        wraplength=500,
+        font=("Helvetica", 14),
+        background="#f5f5f5"
+        ) # create label
     label.bind("<Button-1>", lambda event, labelElem=label: onClick(labelElem)) # bind label to click event
-    label.pack() # display label in pack format
+    label.pack(padx=20, pady=20) # display label in pack format
     
     updateClipboard() # updates clipboard infinitely until windows closes
     
