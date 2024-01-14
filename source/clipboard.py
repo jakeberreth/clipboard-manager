@@ -3,20 +3,31 @@
 ##  Author:     Jake Berreth
 ##  Sources:    https://github.com/prashantgupta24/clipboard-manager
 ################################################################################
-from tkinter import Tk, Label, RAISED
+from tkinter import Tk, Label, Menu
 import pyperclip
+
+# split up text and label so you can destroy all labels but keep the text check
+# go through text list and see if any of the text exists in a label
+# if not, delete from text list
 
 class ClipboardManager():
     ################################################################################
     ################################################################################
     def __init__(self, root):
         self.root          = root
+        self.root.title('Clipboard Manager')
+        self.root['bg'] = '#a9a9a9'
+        self.root.minsize(300, 100)
+        
         self.labelList     = []
-        self.labelTextList = []
+        #self.labelTextList = []
+        
+        self.createMenu()
+        
         
     ################################################################################
     ################################################################################
-    def appendLabelTextToLabelTextList(self, textValue):
+    def appendLabelToLabelList(self, textValue):
         label = Label(
                     root, 
                     text=textValue, 
@@ -31,9 +42,10 @@ class ClipboardManager():
         label.bind("<Button-1>", lambda event, labelElem=label: self.onClick(labelElem)) # bind label to click event
         label.pack(padx=20, pady=20) # display label in pack format
         
-        self.labelTextList.append(label['text'])
+        self.labelList.append(label)
         
         return label
+        
         
     ################################################################################
     ################################################################################
@@ -48,8 +60,13 @@ class ClipboardManager():
     def processClipping(self, clippingText):
         cleanedClippingText = self.cleanClippingText(clippingText=clippingText) # clean clipping text
         
-        if cleanedClippingText not in self.labelTextList:
-            self.appendLabelTextToLabelTextList(cleanedClippingText)
+        for label in self.labelList:
+            if (label["text"] == cleanedClippingText):
+                return
+            
+        if (len(cleanedClippingText) > 0):
+            self.appendLabelToLabelList(cleanedClippingText)
+
 
     ################################################################################
     ################################################################################
@@ -61,18 +78,36 @@ class ClipboardManager():
                 
         return cleanedClippingText
         
+        
     ################################################################################
     ################################################################################
     def onClick(self, labelElem):
         labelText = labelElem["text"] # get text of clicked label
         print(labelText) # print text to the screen
         pyperclip.copy(labelText) # copy label text
+ 
+ 
+    ################################################################################
+    ################################################################################     
+    def clearAllClippings(self):
+        for label in self.labelList:
+            label.destroy()
+            
+            
+    ################################################################################
+    ################################################################################      
+    def createMenu(self):
+        self.menubar = Menu(root)
+        self.root.config(menu=self.menubar)
+        #self.menubar.add_command(label="Clear All", command=self.clearAllClippings)
+        # menubar.add_cascade(label="Options", menu=optionsMenu)
+        #self.parent.config(menu=menubar)
+
 
 ################################################################################
 ################################################################################
 if __name__ == '__main__':
     root = Tk() # root element
-    root['bg'] = '#a9a9a9'
     
     clipboardManager = ClipboardManager(root)
     
