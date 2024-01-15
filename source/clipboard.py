@@ -14,6 +14,7 @@ class ClipboardManager():
         self.root.title('Clipboard Manager')
         self.root['bg'] = '#a9a9a9'
         self.root.minsize(300, 100)
+        root.wm_attributes("-topmost", 1)
         
         self.labelList     = []
         self.labelTextList = []
@@ -22,6 +23,9 @@ class ClipboardManager():
         
         self.forgottenLabel   = None
         self.clearedClippings = False
+        
+        self.shortenedTextToTrueText = {}
+        self.maxDisplayTextLength    = 100
         
         
     ################################################################################
@@ -34,9 +38,9 @@ class ClipboardManager():
                     relief="raised", 
                     padx=20, 
                     pady=10, 
-                    wraplength=200,
-                    width=25,
-                    font=("Helvetica", 14),
+                    wraplength=300,
+                    width=45,
+                    font=("Helvetica", 8),
                     background="#f5f5f5",
                     borderwidth=3,
                 )
@@ -61,15 +65,24 @@ class ClipboardManager():
     ################################################################################
     def processClipping(self, clippingText):
         cleanedClippingText = self.cleanClippingText(clippingText=clippingText) # clean clipping text
-        
-        for label in self.labelList:
-            if (label):
-                if (label["text"] == cleanedClippingText):
-                    return
                 
+        shortenedClippingText = ""
         if (len(cleanedClippingText) > 0):
-            self.appendLabelToLabelList(cleanedClippingText)
-
+            shortenedClippingText = cleanedClippingText
+            self.shortenedTextToTrueText[shortenedClippingText] = cleanedClippingText
+            
+            if (len(cleanedClippingText) > self.maxDisplayTextLength):
+                tempCleanedClipping = cleanedClippingText
+                shortenedClippingText = cleanedClippingText[:self.maxDisplayTextLength] + "..."
+                self.shortenedTextToTrueText[shortenedClippingText] = tempCleanedClipping
+                
+            for label in self.labelList:
+                if (label):
+                    if (label["text"] == shortenedClippingText):
+                        return
+            
+            self.appendLabelToLabelList(shortenedClippingText)
+            
 
     ################################################################################
     ################################################################################
@@ -85,7 +98,7 @@ class ClipboardManager():
     ################################################################################
     ################################################################################
     def onLeftClick(self, labelElem):
-        labelText = labelElem["text"] # get text of clicked label
+        labelText = self.shortenedTextToTrueText[labelElem["text"]] # get text of clicked label
         print(labelText) # print text to the screen
         pyperclip.copy(labelText) # copy label text
  
