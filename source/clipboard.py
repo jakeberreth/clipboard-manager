@@ -14,6 +14,7 @@ class ClipboardManager():
         self.root.title('Clipboard Manager')
         self.root['bg'] = '#a9a9a9'
         self.root.minsize(300, 100)
+        root.wm_attributes("-topmost", 1)
         
         self.labelList     = []
         self.labelTextList = []
@@ -22,6 +23,9 @@ class ClipboardManager():
         
         self.forgottenLabel   = None
         self.clearedClippings = False
+        
+        self.shortenedTextToTrueText = {}
+        self.maxDisplayTextLength    = 100
         
         
     ################################################################################
@@ -34,14 +38,15 @@ class ClipboardManager():
                     relief="raised", 
                     padx=20, 
                     pady=10, 
-                    wraplength=500,
-                    font=("Helvetica", 14),
+                    wraplength=300,
+                    width=45,
+                    font=("Helvetica", 8),
                     background="#f5f5f5",
-                    borderwidth=3
+                    borderwidth=3,
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
         label.bind("<Button-3>", lambda event, labelElem=label: self.onRightClick(labelElem)) # bind label to right click event
-        label.pack(padx=(20, 20), pady=(10, 10)) # display label in pack format
+        label.pack() # display label in pack format
         
         self.labelList.append(label)
         
@@ -60,15 +65,24 @@ class ClipboardManager():
     ################################################################################
     def processClipping(self, clippingText):
         cleanedClippingText = self.cleanClippingText(clippingText=clippingText) # clean clipping text
-        
-        for label in self.labelList:
-            if (label):
-                if (label["text"] == cleanedClippingText):
-                    return
                 
+        shortenedClippingText = ""
         if (len(cleanedClippingText) > 0):
-            self.appendLabelToLabelList(cleanedClippingText)
-
+            shortenedClippingText = cleanedClippingText
+            self.shortenedTextToTrueText[shortenedClippingText] = cleanedClippingText
+            
+            if (len(cleanedClippingText) > self.maxDisplayTextLength):
+                tempCleanedClipping = cleanedClippingText
+                shortenedClippingText = cleanedClippingText[:self.maxDisplayTextLength] + "..."
+                self.shortenedTextToTrueText[shortenedClippingText] = tempCleanedClipping
+                
+            for label in self.labelList:
+                if (label):
+                    if (label["text"] == shortenedClippingText):
+                        return
+            
+            self.appendLabelToLabelList(shortenedClippingText)
+            
 
     ################################################################################
     ################################################################################
@@ -84,7 +98,7 @@ class ClipboardManager():
     ################################################################################
     ################################################################################
     def onLeftClick(self, labelElem):
-        labelText = labelElem["text"] # get text of clicked label
+        labelText = self.shortenedTextToTrueText[labelElem["text"]] # get text of clicked label
         print(labelText) # print text to the screen
         pyperclip.copy(labelText) # copy label text
  
@@ -111,13 +125,13 @@ class ClipboardManager():
     ################################################################################     
     def undo(self):
         if (self.forgottenLabel is not None):
-            self.forgottenLabel.pack(padx=(20, 20), pady=(10, 10))
+            self.forgottenLabel.pack()
             self.forgottenLabel = None
             return
         
         if (self.clearedClippings):
             for label in self.labelList:
-                label.pack(padx=20, pady=20)
+                label.pack()
                 self.clearedClippings = False
                         
             
@@ -128,7 +142,6 @@ class ClipboardManager():
         self.root.config(menu=self.menubar)
         self.menubar.add_command(label="Clear All", command=self.clearAllClippings)
         self.menubar.add_command(label="Undo", command=self.undo)
-        #self.parent.config(menu=menubar)
 
 
 ################################################################################
