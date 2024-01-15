@@ -34,12 +34,12 @@ class ClipboardManager():
                     wraplength=500,
                     font=("Helvetica", 14),
                     background="#f5f5f5",
-                    borderwidth=2
+                    borderwidth=3
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onClick(labelElem)) # bind label to click event
-        label.pack(padx=20, pady=20) # display label in pack format
+        label.pack(padx=(20, 20), pady=(10, 10)) # display label in pack format
         
-        self.labelList.insert(0, label)
+        self.labelList.append(label)
         
         return label
         
@@ -93,12 +93,19 @@ class ClipboardManager():
             
             
     ################################################################################
+    ################################################################################     
+    def undo(self):
+        for label in self.labelList:
+            label.pack(padx=20, pady=20)
+                        
+            
+    ################################################################################
     ################################################################################      
     def createMenu(self):
         self.menubar = Menu(root)
         self.root.config(menu=self.menubar)
         self.menubar.add_command(label="Clear All", command=self.clearAllClippings)
-        # menubar.add_cascade(label="Options", menu=optionsMenu)
+        self.menubar.add_command(label="Undo", command=self.undo)
         #self.parent.config(menu=menubar)
 
 
