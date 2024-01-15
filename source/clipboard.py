@@ -3,7 +3,7 @@
 ##  Author:     Jake Berreth
 ##  Sources:    https://github.com/prashantgupta24/clipboard-manager
 ################################################################################
-from tkinter import Tk, Label, Menu
+from tkinter import Tk, Label, Button, Menu
 import pyperclip
 
 class ClipboardManager():
@@ -12,8 +12,8 @@ class ClipboardManager():
     def __init__(self, root):
         self.root          = root
         self.root.title('Clipboard Manager')
-        self.root['bg'] = '#a9a9a9'
-        self.root.minsize(300, 100)
+        self.root['bg'] = '#638889'
+        self.root.minsize(290, 270)
         root.wm_attributes("-topmost", 1)
         
         self.labelList     = []
@@ -31,7 +31,7 @@ class ClipboardManager():
     ################################################################################
     ################################################################################
     def appendLabelToLabelList(self, textValue):
-        label = Label(
+        label = Button(
                     root, 
                     text=textValue, 
                     cursor="arrow", 
@@ -41,8 +41,8 @@ class ClipboardManager():
                     wraplength=300,
                     width=45,
                     font=("Helvetica", 8),
-                    background="#f5f5f5",
-                    borderwidth=3,
+                    background='#ECE3CE',
+                    borderwidth=0.5
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
         label.bind("<Button-3>", lambda event, labelElem=label: self.onRightClick(labelElem)) # bind label to right click event
