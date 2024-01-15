@@ -34,14 +34,15 @@ class ClipboardManager():
                     relief="raised", 
                     padx=20, 
                     pady=10, 
-                    wraplength=500,
+                    wraplength=200,
+                    width=25,
                     font=("Helvetica", 14),
                     background="#f5f5f5",
-                    borderwidth=3
+                    borderwidth=3,
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
         label.bind("<Button-3>", lambda event, labelElem=label: self.onRightClick(labelElem)) # bind label to right click event
-        label.pack(padx=(20, 20), pady=(10, 10)) # display label in pack format
+        label.pack() # display label in pack format
         
         self.labelList.append(label)
         
@@ -111,13 +112,13 @@ class ClipboardManager():
     ################################################################################     
     def undo(self):
         if (self.forgottenLabel is not None):
-            self.forgottenLabel.pack(padx=(20, 20), pady=(10, 10))
+            self.forgottenLabel.pack()
             self.forgottenLabel = None
             return
         
         if (self.clearedClippings):
             for label in self.labelList:
-                label.pack(padx=20, pady=20)
+                label.pack()
                 self.clearedClippings = False
                         
             
@@ -128,7 +129,6 @@ class ClipboardManager():
         self.root.config(menu=self.menubar)
         self.menubar.add_command(label="Clear All", command=self.clearAllClippings)
         self.menubar.add_command(label="Undo", command=self.undo)
-        #self.parent.config(menu=menubar)
 
 
 ################################################################################
