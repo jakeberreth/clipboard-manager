@@ -20,6 +20,9 @@ class ClipboardManager():
         
         self.createMenu()
         
+        self.forgottenLabel   = None
+        self.clearedClippings = False
+        
         
     ################################################################################
     ################################################################################
@@ -36,7 +39,8 @@ class ClipboardManager():
                     background="#f5f5f5",
                     borderwidth=3
                 )
-        label.bind("<Button-1>", lambda event, labelElem=label: self.onClick(labelElem)) # bind label to click event
+        label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
+        label.bind("<Button-3>", lambda event, labelElem=label: self.onRightClick(labelElem)) # bind label to right click event
         label.pack(padx=(20, 20), pady=(10, 10)) # display label in pack format
         
         self.labelList.append(label)
@@ -79,10 +83,20 @@ class ClipboardManager():
         
     ################################################################################
     ################################################################################
-    def onClick(self, labelElem):
+    def onLeftClick(self, labelElem):
         labelText = labelElem["text"] # get text of clicked label
         print(labelText) # print text to the screen
         pyperclip.copy(labelText) # copy label text
+ 
+    ################################################################################
+    ################################################################################
+    def onRightClick(self, labelElem):
+        labelText = labelElem["text"] # get text of clicked label
+        
+        for label in self.labelList:
+            if (label["text"] == labelText):
+                label.pack_forget()
+                self.forgottenLabel = label
  
  
     ################################################################################
@@ -90,13 +104,21 @@ class ClipboardManager():
     def clearAllClippings(self):
         for label in self.labelList:
             label.pack_forget()
+            self.clearedClippings = True
             
             
     ################################################################################
     ################################################################################     
     def undo(self):
-        for label in self.labelList:
-            label.pack(padx=20, pady=20)
+        if (self.forgottenLabel is not None):
+            self.forgottenLabel.pack(padx=(20, 20), pady=(10, 10))
+            self.forgottenLabel = None
+            return
+        
+        if (self.clearedClippings):
+            for label in self.labelList:
+                label.pack(padx=20, pady=20)
+                self.clearedClippings = False
                         
             
     ################################################################################
