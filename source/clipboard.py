@@ -6,10 +6,6 @@
 from tkinter import Tk, Label, Menu
 import pyperclip
 
-# split up text and label so you can destroy all labels but keep the text check
-# go through text list and see if any of the text exists in a label
-# if not, delete from text list
-
 class ClipboardManager():
     ################################################################################
     ################################################################################
@@ -20,7 +16,7 @@ class ClipboardManager():
         self.root.minsize(300, 100)
         
         self.labelList     = []
-        #self.labelTextList = []
+        self.labelTextList = []
         
         self.createMenu()
         
@@ -37,12 +33,13 @@ class ClipboardManager():
                     pady=10, 
                     wraplength=500,
                     font=("Helvetica", 14),
-                    background="#f5f5f5"
+                    background="#f5f5f5",
+                    borderwidth=2
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onClick(labelElem)) # bind label to click event
         label.pack(padx=20, pady=20) # display label in pack format
         
-        self.labelList.append(label)
+        self.labelList.insert(0, label)
         
         return label
         
@@ -61,9 +58,10 @@ class ClipboardManager():
         cleanedClippingText = self.cleanClippingText(clippingText=clippingText) # clean clipping text
         
         for label in self.labelList:
-            if (label["text"] == cleanedClippingText):
-                return
-            
+            if (label):
+                if (label["text"] == cleanedClippingText):
+                    return
+                
         if (len(cleanedClippingText) > 0):
             self.appendLabelToLabelList(cleanedClippingText)
 
@@ -91,7 +89,7 @@ class ClipboardManager():
     ################################################################################     
     def clearAllClippings(self):
         for label in self.labelList:
-            label.destroy()
+            label.pack_forget()
             
             
     ################################################################################
@@ -99,7 +97,7 @@ class ClipboardManager():
     def createMenu(self):
         self.menubar = Menu(root)
         self.root.config(menu=self.menubar)
-        #self.menubar.add_command(label="Clear All", command=self.clearAllClippings)
+        self.menubar.add_command(label="Clear All", command=self.clearAllClippings)
         # menubar.add_cascade(label="Options", menu=optionsMenu)
         #self.parent.config(menu=menubar)
 
