@@ -13,8 +13,10 @@ class ClipboardManager():
         self.root          = root
         self.root.title('Clipboard Manager')
         self.root['bg'] = '#638889'
-        self.root.minsize(290, 270)
+        self.root.minsize(290, 400)
+        self.root.maxsize(290, 400)
         root.wm_attributes("-topmost", 1)
+        root.resizable(False, False)
         
         self.labelList     = []
         self.labelTextList = []
@@ -39,18 +41,19 @@ class ClipboardManager():
                     padx=20, 
                     pady=10, 
                     wraplength=300,
-                    width=45,
+                    width=38,
                     font=("Helvetica", 8),
-                    background='#ECE3CE',
-                    borderwidth=0.5
+                    background='#ECE3CE'
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
         label.bind("<Button-3>", lambda event, labelElem=label: self.onRightClick(labelElem)) # bind label to right click event
-        label.pack() # display label in pack format
         
         self.labelList.append(label)
         
-        return label
+        if (label == self.labelList[len(self.labelList) - 1]):
+            label.pack(pady=(10, 0)) # display label in pack format
+        else:
+            label.pack(pady=(10, 10))
         
         
     ################################################################################
@@ -125,14 +128,16 @@ class ClipboardManager():
     ################################################################################     
     def undo(self):
         if (self.forgottenLabel is not None):
-            self.forgottenLabel.pack()
+            self.forgottenLabel.pack(pady=(10, 0))
             self.forgottenLabel = None
+            self.clearedClippings = False
             return
         
         if (self.clearedClippings):
             for label in self.labelList:
-                label.pack()
+                label.pack(pady=(10, 0))
                 self.clearedClippings = False
+                self.forgottenLabel = None
                         
             
     ################################################################################
