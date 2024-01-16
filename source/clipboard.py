@@ -30,6 +30,8 @@ class ClipboardManager():
         self.shortenedTextToTrueText = {}
         self.maxDisplayTextLength    = 100
         
+        self.maxClippings      = 4
+        
         
     ################################################################################
     ################################################################################
@@ -44,7 +46,7 @@ class ClipboardManager():
                     wraplength=300,
                     width=38,
                     font=("Helvetica", 8),
-                    background='#ECE3CE'
+                    background='#D6E8DB'
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
         label.bind("<Button-3>", lambda event, labelElem=label: self.onRightClick(labelElem)) # bind label to right click event
