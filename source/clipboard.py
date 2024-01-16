@@ -3,7 +3,7 @@
 ##  Author:     Jake Berreth
 ##  Sources:    https://github.com/prashantgupta24/clipboard-manager
 ################################################################################
-from tkinter import Tk, Label, Menu
+from tkinter import Tk, Label, Button, Menu
 import pyperclip
 
 class ClipboardManager():
@@ -12,15 +12,18 @@ class ClipboardManager():
     def __init__(self, root):
         self.root          = root
         self.root.title('Clipboard Manager')
-        self.root['bg'] = '#a9a9a9'
-        self.root.minsize(300, 100)
+        self.root['bg'] = '#638889'
+        self.root.minsize(290, 400)
+        self.root.maxsize(290, 400)
         root.wm_attributes("-topmost", 1)
+        root.resizable(False, False)
         
         self.labelList     = []
         self.labelTextList = []
         
         self.createMenu()
         
+        self.forgottenLabels  = []
         self.forgottenLabel   = None
         self.clearedClippings = False
         
@@ -31,7 +34,7 @@ class ClipboardManager():
     ################################################################################
     ################################################################################
     def appendLabelToLabelList(self, textValue):
-        label = Label(
+        label = Button(
                     root, 
                     text=textValue, 
                     cursor="arrow", 
@@ -39,18 +42,19 @@ class ClipboardManager():
                     padx=20, 
                     pady=10, 
                     wraplength=300,
-                    width=45,
+                    width=38,
                     font=("Helvetica", 8),
-                    background="#f5f5f5",
-                    borderwidth=3,
+                    background='#ECE3CE'
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
         label.bind("<Button-3>", lambda event, labelElem=label: self.onRightClick(labelElem)) # bind label to right click event
-        label.pack() # display label in pack format
         
         self.labelList.append(label)
         
-        return label
+        if (label == self.labelList[len(self.labelList) - 1]):
+            label.pack(pady=(10, 0)) # display label in pack format
+        else:
+            label.pack(pady=(10, 10))
         
         
     ################################################################################
@@ -111,6 +115,7 @@ class ClipboardManager():
             if (label["text"] == labelText):
                 label.pack_forget()
                 self.forgottenLabel = label
+                self.forgottenLabels.append(label)
  
  
     ################################################################################
@@ -119,20 +124,25 @@ class ClipboardManager():
         for label in self.labelList:
             label.pack_forget()
             self.clearedClippings = True
+            self.forgottenLabel = None
             
             
     ################################################################################
     ################################################################################     
     def undo(self):
         if (self.forgottenLabel is not None):
-            self.forgottenLabel.pack()
+            self.forgottenLabels.remove(self.forgottenLabel)
+            self.forgottenLabel.pack(pady=(10, 0))
             self.forgottenLabel = None
+            self.clearedClippings = False
             return
         
         if (self.clearedClippings):
             for label in self.labelList:
-                label.pack()
-                self.clearedClippings = False
+                if (label not in self.forgottenLabels):
+                    label.pack(pady=(10, 0))
+                    self.clearedClippings = False
+                    self.forgottenLabel = None
                         
             
     ################################################################################
@@ -154,5 +164,8 @@ if __name__ == '__main__':
     clipboardManager.updateClipboard() # updates clipboard infinitely until windows closes
     
     clipboardManager.root.mainloop() # main application loop
+    
+    
+    
     
     
