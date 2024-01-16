@@ -23,6 +23,7 @@ class ClipboardManager():
         
         self.createMenu()
         
+        self.forgottenLabels  = []
         self.forgottenLabel   = None
         self.clearedClippings = False
         
@@ -114,6 +115,7 @@ class ClipboardManager():
             if (label["text"] == labelText):
                 label.pack_forget()
                 self.forgottenLabel = label
+                self.forgottenLabels.append(label)
  
  
     ################################################################################
@@ -122,12 +124,14 @@ class ClipboardManager():
         for label in self.labelList:
             label.pack_forget()
             self.clearedClippings = True
+            self.forgottenLabel = None
             
             
     ################################################################################
     ################################################################################     
     def undo(self):
         if (self.forgottenLabel is not None):
+            self.forgottenLabels.remove(self.forgottenLabel)
             self.forgottenLabel.pack(pady=(10, 0))
             self.forgottenLabel = None
             self.clearedClippings = False
@@ -135,9 +139,10 @@ class ClipboardManager():
         
         if (self.clearedClippings):
             for label in self.labelList:
-                label.pack(pady=(10, 0))
-                self.clearedClippings = False
-                self.forgottenLabel = None
+                if (label not in self.forgottenLabels):
+                    label.pack(pady=(10, 0))
+                    self.clearedClippings = False
+                    self.forgottenLabel = None
                         
             
     ################################################################################
@@ -159,5 +164,8 @@ if __name__ == '__main__':
     clipboardManager.updateClipboard() # updates clipboard infinitely until windows closes
     
     clipboardManager.root.mainloop() # main application loop
+    
+    
+    
     
     
