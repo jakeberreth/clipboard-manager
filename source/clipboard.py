@@ -43,9 +43,9 @@ class ClipboardManager():
                     relief="raised", 
                     padx=20, 
                     pady=10, 
-                    wraplength=300,
-                    width=38,
-                    font=("Helvetica", 8),
+                    wraplength=265,
+                    width=28,
+                    font=("Helvetica", 10),
                     background='#D6E8DB'
                 )
         label.bind("<Button-1>", lambda event, labelElem=label: self.onLeftClick(labelElem)) # bind label to left click event
